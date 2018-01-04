@@ -1,7 +1,10 @@
 package com.firebase.androidchat;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.SharedPreferences;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -16,33 +19,47 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-
-import java.util.Random;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends ListActivity {
 
-    // TODO: change this to your own Firebase URL
-    private static final String FIREBASE_URL = "https://android-chat.firebaseio-demo.com";
+    //Firebase URL
+    private static final String FIREBASE_URL = "https://internship-android-sora.firebaseio.com/ ";
 
     private String mUsername;
     private Firebase mFirebaseRef;
     private ValueEventListener mConnectedListener;
     private ChatListAdapter mChatListAdapter;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private String uid;
+    private String Passname;
+
+    private void loadLogInView() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Make sure we have a mUsername
+        //縦画面固定
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //なまえの登録
         setupUsername();
 
-        setTitle("Chatting as " + mUsername);
+        setTitle("あいことば " + Passname);
 
-        // Setup our Firebase mFirebaseRef
-        mFirebaseRef = new Firebase(FIREBASE_URL).child("chat");
+        // チャットルームの生成
+        Intent intent=getIntent();
+        Passname=intent.getStringExtra("Passname");
+        mFirebaseRef = new Firebase(FIREBASE_URL).child(""+Passname+"");
 
-        // Setup our input methods. Enter key on the keyboard or pushing the send button
+        //メッセージ送信
         EditText inputText = (EditText) findViewById(R.id.messageInput);
         inputText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -61,15 +78,33 @@ public class MainActivity extends ListActivity {
             }
         });
 
+        //ログイン済かチェック
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        if (mFirebaseUser == null||mUsername==null) {
+            //ログインしていなければログイン画面に遷移
+            loadLogInView();
+        }
+        uid = mFirebaseUser.getUid();
+
+
+
     }
+
+
 
     @Override
     public void onStart() {
         super.onStart();
-        // Setup our view and list adapter. Ensure it scrolls to the bottom as data changes
+
+        setupUsername();
+
+        setTitle("あいことば " +Passname);
+        // lv設定
         final ListView listView = getListView();
-        // Tell our list adapter that we only want 50 messages at a time
-        mChatListAdapter = new ChatListAdapter(mFirebaseRef.limit(50), this, R.layout.chat_message, mUsername);
+        // アダプタ設定
+        mChatListAdapter = new ChatListAdapter(mFirebaseRef.limit(50), this, R.layout.chat_message, mUsername,uid);
         listView.setAdapter(mChatListAdapter);
         mChatListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -79,7 +114,24 @@ public class MainActivity extends ListActivity {
             }
         });
 
-        // Finally, a little indication of connection status
+        /*
+        // リストビューのアイテムが長押しされた時に呼び出す。
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+
+                // 長押しされたアイテムを取得する。
+                Chat item = (Chat) parent.getItemAtPosition(position);
+                System.out.println(item.getId());
+
+                return false;
+            }
+
+        });
+        */
+
+
+        // データベース接続確認
         mConnectedListener = mFirebaseRef.getRoot().child(".info/connected").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,14 +157,38 @@ public class MainActivity extends ListActivity {
         mChatListAdapter.cleanup();
     }
 
+    //戻るボタンの処理
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode==KeyEvent.KEYCODE_BACK){
+            new AlertDialog.Builder(this)
+                    .setMessage("部屋から退出しますか？")
+                    .setPositiveButton("はい", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //ログイン画面に遷移
+                            loadLogInView();
+                        }
+                    })
+                    .setNegativeButton("いいえ", null)
+                    .show();
+            return false;
+        }
+        return false;
+    }
+
     private void setupUsername() {
-        SharedPreferences prefs = getApplication().getSharedPreferences("ChatPrefs", 0);
-        mUsername = prefs.getString("username", null);
+       // SharedPreferences prefs = getApplication().getSharedPreferences("ChatPrefs", 0);
+        //mUsername = prefs.getString("username", null);
         if (mUsername == null) {
-            Random r = new Random();
+            //Random r = new Random();
             // Assign a random user name if we don't have one saved.
-            mUsername = "JavaUser" + r.nextInt(100000);
-            prefs.edit().putString("username", mUsername).commit();
+            //mUsername = "JavaUser" + r.nextInt(100000);
+
+            Intent intent=getIntent();
+            mUsername=intent.getStringExtra("Username");
+
+           // prefs.edit().putString("username", mUsername).commit();
         }
     }
 
@@ -120,9 +196,8 @@ public class MainActivity extends ListActivity {
         EditText inputText = (EditText) findViewById(R.id.messageInput);
         String input = inputText.getText().toString();
         if (!input.equals("")) {
-            // Create our 'model', a Chat object
-            Chat chat = new Chat(input, mUsername);
-            // Create a new, auto-generated child of that chat location, and save our chat data there
+            // Chatオブジェクト
+            Chat chat = new Chat(input, mUsername,uid);
             mFirebaseRef.push().setValue(chat);
             inputText.setText("");
         }

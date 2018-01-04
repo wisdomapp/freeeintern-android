@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "598834595125",
+    "firebase_url": "https://internship-android-sora.firebaseio.com",
+    "project_id": "internship-android-sora",
+    "storage_bucket": "internship-android-sora.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598834595125:android:22d76935dc8bf743",
+        "android_client_info": {
+          "package_name": "com.firebase.androidchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "598834595125-j37gve1a8ftuogui7qhtp7q0qpp0j27e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2f_KVJVdFVpLji7mU86mLiYqjJeCLVGQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
