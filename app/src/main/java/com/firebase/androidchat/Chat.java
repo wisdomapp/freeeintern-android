@@ -11,6 +11,7 @@ public class Chat {
     private String id;
 
 
+
     private Chat() {
     }
 

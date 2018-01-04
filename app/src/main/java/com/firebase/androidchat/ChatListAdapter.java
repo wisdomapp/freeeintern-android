@@ -14,6 +14,7 @@ public class ChatListAdapter extends FirebaseListAdapter<Chat> {
     private String uid;
 
 
+
     public ChatListAdapter(Query ref, Activity activity, int layout, String mUsername,String uid) {
         super(ref, Chat.class, layout, activity);
         this.mUsername = mUsername;
