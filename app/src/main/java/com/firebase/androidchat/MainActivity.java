@@ -105,7 +105,7 @@ public class MainActivity extends ListActivity {
         // lv設定
         final ListView listView = getListView();
         // アダプタ設定
-        mChatListAdapter = new ChatListAdapter(mFirebaseRef.limit(50), this, R.layout.chat_message, mUsername,uid);
+        mChatListAdapter = new ChatListAdapter(mFirebaseRef, this, R.layout.chat_message, mUsername,uid);
         listView.setAdapter(mChatListAdapter);
         mChatListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Firebase Chat</string>
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">ログイン</string>
     <string name="login_error_title">Error!</string>
 
 </resources>

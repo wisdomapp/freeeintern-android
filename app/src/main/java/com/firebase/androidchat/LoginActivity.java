@@ -25,6 +25,7 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
         //縦画面固定
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         mAuth = FirebaseAuth.getInstance();
 
         findViewById(R.id.loginButton).setOnClickListener(new View.OnClickListener() {

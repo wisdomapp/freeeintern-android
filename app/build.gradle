@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE-FIREBASE.txt'
@@ -18,8 +22,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //minifyEnabled true
+           // proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
         nosign {
             debuggable false
@@ -34,7 +38,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:23.0.0'
+    implementation 'com.android.support:appcompat-v7:24.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.google.firebase:firebase-core:9.2.1'
